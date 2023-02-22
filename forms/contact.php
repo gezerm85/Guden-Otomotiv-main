@@ -1,41 +1,45 @@
-<?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
-
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'recept462@gmail.com';
-
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
-  }
-
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
-
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'mail.birgad.com',
-    'username' => 'info@birgad.com',
-    'password' => 'Asdas341!',
-    'port' => '587'
-  );
-  */
-
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
-
-  echo $contact->send();
+<?php
+require("class.phpmailer.php");
+$mail = new PHPMailer(); // create a new object
+$mail->IsSMTP(); // enable SMTP
+$mail->SMTPDebug = 1; // debugging: 1 = errors and messages, 2 = messages only
+$mail->SMTPAuth = true; // authentication enabled
+$mail->SMTPSecure = 'ssl'; // secure transfer enabled REQUIRED for GMail
+$mail->Host = "mail.birgad.com";
+$mail->Port = 465; // or 587
+$mail->IsHTML(true);
+$mail->SetLanguage("tr", "phpmailer/language");
+$mail->CharSet  ="utf-8";
+
+$mail->Username = "replay@birgad.com"; // Mail adresi
+$mail->Password = '$iwD8;uf}9gn'; // Parola
+$mail->SetFrom("replay@birgad.com", "Birgad Medya"); // Mail adresi
+
+$mail->AddAddress("info@gudenotomotiv.com"); // Gönderilecek kişi
+
+if (isset($_POST['subject'])) {
+    $contact =  "İletişim Formu"  ."<br>" ."Ad Soyad: " . htmlspecialchars($_POST['name']) . "<br>" . "Telefon Numarası: " . htmlspecialchars($_POST['phone']) 
+    . "<br>" . "Email: " . htmlspecialchars($_POST['email']) . "<br>"  . "Konu: " . htmlspecialchars($_POST['subject']).
+    "<br>"  . "Mesaj: " . htmlspecialchars($_POST['message']);
+} elseif (isset($_POST['phone_contact'])) {
+    $contact =  "Bize Ulaşın Formu"  ."<br>" ."Ad Soyad: " . htmlspecialchars($_POST['name']) . "<br>" . "Telefon Numarası: " . htmlspecialchars($_POST['phone_contact']) ;
+}
+
+
+
+$mail->Subject = "Siteden Gönderildi";
+$mail->Body = "$name<br />$email<br />$subject<br />$contact";
+
+if(!$mail->Send()){
+                echo "Mailer Error: ".$mail->ErrorInfo;
+} else {
+    
+    if (isset($_POST['subject'])) {
+    header("location:../iletisim.html");
+} elseif (isset($_POST['phone_contact'])) {
+    header("location:../index.html");
+}
+    
+               
+}
 ?>
